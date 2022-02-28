@@ -1,13 +1,13 @@
 {
-  "name": "node-typescript-boilerplate",
+  "name": "event-manager-consumer",
   "version": "0.0.0",
-  "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
+  "description": "A basic POC to test how consume the custom event manager program from Solana.",
   "engines": {
     "node": ">= 16.13 <17"
   },
   "devDependencies": {
     "@types/jest": "~27.0.2",
-    "@types/node": "~16.11.6",
+    "@types/node": "^16.11.26",
     "@typescript-eslint/eslint-plugin": "~5.7.0",
     "@typescript-eslint/parser": "~5.7.0",
     "eslint": "~8.4.1",
@@ -18,22 +18,31 @@
     "rimraf": "~3.0.2",
     "ts-jest": "~27.1.1",
     "tsutils": "~3.21.0",
+    "ts-node": "^10.5.0",
     "typescript": "~4.5.3"
   },
   "scripts": {
-    "start": "node build/src/main.js",
+    "start": "ts-node build/src/main.js",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "lanzale": "npm run build && npm run start"
   },
-  "author": "Jakub Synowiec <jsynowiec@users.noreply.github.com>",
+  "author": "Andres Guerrero <andresmgsl@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "tslib": "~2.3.1"
+    "@solana/buffer-layout": "^4.0.0",
+    "@solana/buffer-layout-utils": "^0.2.0",
+    "@solana/spl-token": "^0.2.0",
+    "@solana/web3.js": "^1.35.1",
+    "borsh": "^0.7.0",
+    "bs58": "^5.0.0",
+    "tslib": "~2.3.1",
+    "yaml": "^1.10.2"
   },
   "volta": {
     "node": "16.13.0"

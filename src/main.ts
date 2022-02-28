@@ -1,32 +1,40 @@
-/**
- * Some predefined delay values (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
+import { Connection } from '@solana/web3.js';
+import {
+  getEventManagerProgramAccountData,
+  getOrCreateEventAccount,
+} from './actions';
+import { SOLANA_NETWORK } from './constants';
+import { checkProgram, getPayer } from './utils';
+import { initMessage } from './utils/commons';
+
+const connection = new Connection(SOLANA_NETWORK.LOCAL_NET); // obviamente esto lo moveremos, es por prueba
+
+async function main() {
+  console.log('Retreiving program info...');
+  const [isDeployed, programAccount] = await checkProgram();
+  console.log('Program Status : ' + isDeployed ? 'Deployed' : 'Not deployed');
+
+  if (isDeployed) {
+    console.log(
+      'Program Account Info',
+      programAccount,
+      programAccount.owner.toBase58(),
+    );
+
+    const payer = await getPayer();
+    console.log('Payer PublicKey -> ', payer.publicKey.toBase58());
+    const eventPubkey = await getOrCreateEventAccount(connection, payer);
+
+    console.log('Event Manager Account PubKey', eventPubkey);
+
+    getEventManagerProgramAccountData(connection, eventPubkey);
+  } else {
+    console.log('Be sure you deployed the program');
+  }
 }
 
-/**
- * Returns a Promise<string> that resolves after a given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - A number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
-}
+(async () => {
+  initMessage();
 
-// Below are examples of using ESLint errors suppression
-// Here it is suppressing a missing return type definition for the greeter function.
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function greeter(name: string) {
-  return await delayedHello(name, Delays.Long);
-}
+  await main();
+})();
