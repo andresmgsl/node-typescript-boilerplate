@@ -1,59 +1,11 @@
-import {
-  Commitment,
-  Connection,
-  Keypair,
-  PublicKey,
-  sendAndConfirmTransaction,
-  SystemProgram,
-  Transaction,
-} from '@solana/web3.js';
-import { EVENT_PROGRAM_ID } from '../constants';
-import { EventAccountLayout, EVENT_ACCOUNT_SIZE } from '../state/event';
+import { Commitment, Connection, PublicKey } from '@solana/web3.js';
 
-export async function getOrCreateEventAccount(
-  connection: Connection,
-  payer: Keypair,
-) {
-  const EVENT_SEED = 'event-solana';
-  const eventProgramId = new PublicKey(EVENT_PROGRAM_ID);
-  const eventPubkey = await PublicKey.createWithSeed(
-    payer.publicKey,
-    EVENT_SEED,
-    eventProgramId,
-  );
+import { EVENT_ACCOUNT_SIZE, EventAccountLayout } from '../state/event';
 
-  const eventAccount = await connection.getAccountInfo(eventPubkey);
-
-  if (eventAccount === null) {
-    console.log('Creating account', eventPubkey.toBase58());
-    const lamports = await connection.getMinimumBalanceForRentExemption(
-      EVENT_ACCOUNT_SIZE,
-    );
-
-    const transaction = new Transaction().add(
-      SystemProgram.createAccountWithSeed({
-        fromPubkey: payer.publicKey,
-        basePubkey: payer.publicKey,
-        seed: EVENT_SEED,
-        newAccountPubkey: eventPubkey,
-        lamports,
-        space: EVENT_ACCOUNT_SIZE,
-        programId: eventProgramId,
-      }),
-    );
-    const TxID = await sendAndConfirmTransaction(connection, transaction, [
-      payer,
-    ]);
-
-    console.log('SIGNATURE -> ', TxID);
-  }
-
-  console.log('EVENT ACCOUNT -> -> ', eventAccount);
-
-  return eventPubkey;
-}
-
-export async function getEventManagerProgramAccountData(
+/**
+ * Get and decode data from solana
+ */
+export async function getAndDecodeEventAccountData(
   connection: Connection,
   address: PublicKey,
   commitment?: Commitment,
